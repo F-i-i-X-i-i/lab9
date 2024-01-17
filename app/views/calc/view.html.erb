@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>AJAX calc test</title>
+        <script>
+            calc_url= location.protocol + "//" + location.host +
+            "/calc/view.json"
+            function send_query(){
+                var frm = document.forms.calc_form;
+                var param_str = "?n=" + frm.n.value;
+
+                if (param_str === "?n=") return false;
+
+                var my_JSON_object = {};
+                var http_request = new XMLHttpRequest();
+
+                http_request.open("GET", calc_url+param_str, true);
+                
+                http_request.onreadystatechange = function () {
+                    var done = 4, ok = 200;
+                    if (http_request.readyState == done && http_request.status == ok) {
+                        my_JSON_object = JSON.parse(http_request.responseText);
+                        show_result(my_JSON_object);
+                }
+                };
+                http_request.send(null);
+                return false;
+            }
+            function show_result(data){
+                var result_table = document.getElementById("result_table");
+                var result_text = document.getElementById("result_text");
+                if (data.type == "Array") {
+                    result_text.innerHTML = "Все взаимно-дружественные числа, найденные в диапазоне от 1 до " + data.n + ":";
+                    result_table.innerHTML = "<table> <tr><td>первое число</td><td>второе число</td></tr>\n";
+
+                    for (let i = 0; i < data.value.length; i++) {
+                    console.log(data.value[i][0].toString());
+                        result_table.innerHTML += "<tr><td>" + data.value[i][0].toString()+"</td><td>"+ data.value[i][1].toString()+"</td></tr>\n"
+                    }
+                        result_table.innerHTML += "</table>"
+                } else {
+                    result_text.innerHTML = data.value;
+                    result_table.innerHTML = "";
+                }
+            }
+        </script>
+    </head>
+    <body>
+    <h1>Lab9</h1>
+        <form name="calc_form" method="get">
+            <label for="n:">n:</label>
+            <input id="n" name="n" type="number" /><br/>
+            <br/>
+            <input name="commit" type="submit"
+            value="Calc result" onclick="return send_query();" />
+        </form>
+        <div id="result">
+            <p id = "result_text"></p>
+            <table id = "result_table">
+            </table>
+        </div>
+    </body>
+</html> 
